@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="VioEnchants:jar">
+    <output-path>$USER_HOME$/Downloads/test/plugins</output-path>
+    <root id="archive" name="VioEnchants.jar">
+      <element id="module-output" name="VioEnchants" />
+    </root>
+  </artifact>
+</component>

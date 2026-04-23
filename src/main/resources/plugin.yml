@@ -1,0 +1,9 @@
+name: VioEnchants
+version: 1.0
+main: com.violentuso.vioEnchants.VioEnchants
+api-version: 1.20 # или твоя версия
+depends: WorldGuard
+commands:
+  vioenchant:
+    description: Главная команда плагина
+    usage: /vioenchant <give|enchant>

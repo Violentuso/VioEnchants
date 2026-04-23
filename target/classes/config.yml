@@ -1,0 +1,913 @@
+# ==============================================================================
+#                     VioEnchants — Конфигурация Зачарований
+# ==============================================================================
+#
+# Как работают шансы в столе зачарований (table):
+#   base-chance: Шанс того, что это зачарование вообще выпадет (для 1 уровня).
+#   chance-per-exp: Увеличивает шанс выпадения в зависимости от уровня опыта, потраченного игроком.
+#   levels: Настройки для получения более высоких уровней (2, 3 и т.д.).
+#     threshold: Минимальный уровень опыта, который должен потратить игрок, чтобы иметь шанс получить этот уровень.
+#     chance: Вероятность повышения уровня зачарования, если условие threshold выполнено.
+#
+# allowed-items: Список материалов, на которые можно наложить зачарование.
+# Используйте официальные названия Bukkit (например, DIAMOND_SWORD, BOW, TRIDENT).
+# ==============================================================================
+# Глобальные ограничения для всех зачарований
+global:
+  worldguard:
+    # Список регионов, где ВСЕ зачарования не работают
+    blocked-regions:
+      - "spawn"
+      - "safe_zone"
+    # Список флагов WorldGuard — если флаг установлен в регионе, зачарования не работают
+    # Например: pvp deny — если в регионе pvp=deny, то зачарования отключены
+    blocked-flags:
+      - "pvp"  # если pvp=deny в регионе — зачарования не работают
+enchants:
+  # ----------------------------------------------------------------------------
+  # ДЕТЕКЦИЯ
+  # Накладывает эффект свечения (Glowing) на врага при ударе.
+  # ----------------------------------------------------------------------------
+  detection:
+    general:
+      enabled: true
+      name: "Детекция"
+      max-level: 3
+      allowed-items:
+        - NETHERITE_SWORD
+        - DIAMOND_SWORD
+        - IRON_SWORD
+        - GOLDEN_SWORD
+        - WOODEN_SWORD
+        - STONE_SWORD
+        - TRIDENT
+        - NETHERITE_AXE
+        - DIAMOND_AXE
+        - BOW
+        - CROSSBOW
+    anvil:
+      cost-per-level: 1  # Стоимость объединения в наковальне за каждый уровень
+    table:
+      enabled: true
+      base-chance: 0.15
+      chance-per-exp: 0.004
+      levels:
+        1:
+          threshold: 5 #Минимальный уровень в столе зачарвоания
+          chance: 0.30
+        2:
+          threshold: 25
+          chance: 0.15
+        3:
+          threshold: 30
+          chance: 0.05
+    combat:
+      # Шанс срабатывания эффекта.
+      # Формула: chance-base + (chance-per-level * Уровень_Чар)
+      # Пример: База 0.20 + (0.10 * 3 ур) = 0.50 (50% шанс)
+      chance-base: 0.20
+      chance-per-level: 0.10
+      effect:
+        # Длительность эффекта в тиках (20 тиков = 1 секунда).
+        # Формула: duration-base + (duration-per-level * Уровень_Чар)
+        # Пример: 40 + (30 * 3) = 150 тиков (6.5 секунд)
+        duration-base: 40
+        duration-per-level: 30
+        amplifier-divisor: 1 # Увеличение уровня эффекта за единицу уровня зачарования(Желательно оставить единицу)
+
+  # ----------------------------------------------------------------------------
+  # СНАЙПЕР
+  # Увеличивает скорость полета стрел и трезубцев.
+  # ----------------------------------------------------------------------------
+  sniper:
+    general:
+      enabled: true
+      name: "Снайпер"
+      max-level: 2
+      allowed-items:
+        - BOW
+        - CROSSBOW
+        - TRIDENT
+    anvil:
+      cost-per-level: 1
+    table:
+      enabled: true
+      base-chance: 0.1
+      chance-per-exp: 0.003
+      levels:
+        1:
+          threshold: 5
+          chance: 0.20
+        2:
+          threshold: 30
+          chance: 0.10
+    velocity:
+      # Множитель скорости полета снаряда.
+      # Формула: multiplier-base + (multiplier-per-level * Уровень_Чар)
+      # 1.0 = стандартная скорость.
+      # Пример (3 уровень): 1.0 + (0.2 * 3) = 1.6 (В ~1.6 раз быстрее)
+      multiplier-base: 1.0
+      multiplier-per-level: 0.2
+    particles:
+      enabled: true
+      # Тип частиц (след за стрелой). Популярные: CRIT, FLAME, VILLAGER_HAPPY, SMOKE_NORMAL
+      type: "CRIT"
+      count: 1
+
+  # ----------------------------------------------------------------------------
+  # ОКИСЛЕНИЕ
+  # Быстро ломает броню противника при ударе.
+  # ----------------------------------------------------------------------------
+  oxidation:
+    general:
+      enabled: true
+      name: "Окисление"
+      max-level: 2
+      allowed-items:
+        - NETHERITE_SWORD
+        - DIAMOND_SWORD
+        - IRON_SWORD
+        - GOLDEN_SWORD
+        - WOODEN_SWORD
+        - STONE_SWORD
+        - TRIDENT
+    anvil:
+      cost-per-level: 2
+    table:
+      enabled: true
+      base-chance: 0.1
+      chance-per-exp: 0.002
+      levels:
+        1:
+          chance: 0.30
+          threshold: 5
+        2:
+          chance: 0.10
+          threshold: 30
+    combat:
+      # Шанс срабатывания (1.0 = 100% срабатывание при каждом ударе)
+      chance-base: 1.0
+      chance-per-level: 0.0
+    oxidation:
+      # Сколько прочности (durability) отнимать у брони врага.
+      # Формула: damage-base + (damage-per-level * Уровень_Чар)
+      # Пример (3 уровень): 2 + (3 * 3) = 11 единиц прочности за удар (по каждой надетой части брони).
+      damage-base: 2
+      damage-per-level: 3
+
+  # ----------------------------------------------------------------------------
+  # ВАМПИРИЗМ
+  # Дает шанс получить эффект Регенерации при ударе.
+  # ----------------------------------------------------------------------------
+  vampirism:
+    general:
+      enabled: true
+      name: "Вампиризм"
+      max-level: 2
+      allowed-items:
+        - NETHERITE_SWORD
+        - DIAMOND_SWORD
+        - IRON_SWORD
+        - GOLDEN_SWORD
+        - WOODEN_SWORD
+        - STONE_SWORD
+        - TRIDENT
+        - NETHERITE_AXE
+        - DIAMOND_AXE
+    anvil:
+      cost-per-level: 1
+    table:
+      enabled: true
+      base-chance: 0.05
+      chance-per-exp: 0.002
+      levels:
+        1:
+          threshold: 5
+          chance: 0.30
+        2:
+          threshold: 30
+          chance: 0.10
+    combat:
+      # Шанс: 0.05 + (0.10 * уровень).
+      # Уровень 1 = 15%
+      chance-base: 0.05
+      chance-per-level: 0.10
+      effect:
+        # Длительность регенерации в тиках.
+        duration-base: 40
+        duration-per-level: 10
+        amplifier-divisor: 1
+
+  # ----------------------------------------------------------------------------
+  # ЯД
+  # Отравляет противника при ударе.
+  # ----------------------------------------------------------------------------
+  poison:
+    general:
+      enabled: true
+      name: "Яд"
+      max-level: 3
+      allowed-items:
+        - NETHERITE_SWORD
+        - DIAMOND_SWORD
+        - IRON_SWORD
+        - GOLDEN_SWORD
+        - WOODEN_SWORD
+        - STONE_SWORD
+        - TRIDENT
+    anvil:
+      cost-per-level: 2
+    table:
+      enabled: true
+      base-chance: 0.15
+      chance-per-exp: 0.005
+      levels:
+        1:
+          threshold: 5
+          chance: 0.30
+        2:
+          threshold: 25
+          chance: 0.20
+        3:
+          threshold: 30
+          chance: 0.05
+    combat:
+      chance-base: 0.10
+      chance-per-level: 0.05
+      effect:
+        duration-base: 60
+        duration-per-level: 20
+        amplifier-divisor: 1
+  # ----------------------------------------------------------------------------
+  # СКАУТ
+  # Притягивает игрока к месту падения трезубца.
+  # ----------------------------------------------------------------------------
+  scout:
+    general:
+      enabled: true
+      name: "Скаут"
+      max-level: 2
+      allowed-items:
+        - TRIDENT
+    anvil:
+      cost-per-level: 2
+    table:
+      enabled: true
+      base-chance: 0.1
+      chance-per-exp: 0.003
+      levels:
+        1:
+          threshold: 25
+          chance: 0.10
+        2:
+          threshold: 30
+          chance: 0.05
+    pull:
+      # Сила рывка к трезубцу
+      # Пример: 1.0 (база) + (0.6 * 2 ур) = 2.2 блока/тик
+      strength-base: 1.0
+      strength-per-level: 0.6
+
+      # Подбрасывание вверх
+      vertical-bonus: 0.4
+  # ----------------------------------------------------------------------------
+  # ВОЗВРАЩЕНИЕ
+  # Мгновенно возвращает трезубец в инвентарь при попадании.
+  # Требует наличие ванильного зачарования Верность.
+  # ----------------------------------------------------------------------------
+  recall:
+    general:
+      enabled: true
+      name: "Возвращение"
+      max-level: 3
+      allowed-items:
+        - TRIDENT
+    anvil:
+      cost-per-level: 4
+    table:
+      enabled: true
+      base-chance: 0.05
+      chance-per-exp: 0.002
+      levels:
+        1:
+          threshold: 30
+          chance: 0.20
+    combat:
+      chance-base: 0.20
+      chance-per-level: 0.15
+  # ----------------------------------------------------------------------------
+  # ПОДРЫВНИК
+  # Создает взрыв при попадании стрелы или трезубца.
+  # ----------------------------------------------------------------------------
+  explosive:
+    general:
+      enabled: true
+      name: "Подрывник"
+      max-level: 1
+      allowed-items:
+        - BOW
+        - CROSSBOW
+        - TRIDENT
+    anvil:
+      cost-per-level: 3
+    table:
+      enabled: true
+      base-chance: 0.1
+      chance-per-exp: 0.003
+      levels:
+        1:
+          threshold: 30
+          chance: 0.03
+    explosion:
+      # Вероятность взрыва при попадании.
+      chance-base: 0.15         # 15% база
+      chance-per-level: 0.05    # +0.5% за уровень
+      
+      # Радиус поражения сущностей (мобов/игроков).
+      radius: 4.0
+      
+      # Урон от взрыва (наносится напрямую сущности, не зависит от брони так сильно, как ванильный взрыв).
+      damage-base: 4.0
+      damage-per-level: 2.0
+      
+      # Сила отбрасывания врагов.
+      knockback-base: 0.8
+      knockback-per-level: 0.4
+      
+      # Поджигать ли врагов и блоки?
+      fire: false
+      
+      # Ломать ли блоки взрывом?
+      break-blocks: false
+      
+      particles:
+        enabled: true
+        type: "EXPLOSION_LARGE"
+        count: 15
+  # ----------------------------------------------------------------------------
+  # АВТО-ПЛАВКА
+  # Автоматически переплавляет добытые ресурсы (Руда -> Слиток, Песок -> Стекло).
+  # ----------------------------------------------------------------------------
+  autosmelt:
+    general:
+      enabled: true
+      name: "Авто-плавка"
+      max-level: 1
+      allowed-items:
+        - NETHERITE_PICKAXE
+        - DIAMOND_PICKAXE
+        - IRON_PICKAXE
+        - GOLDEN_PICKAXE
+        - STONE_PICKAXE
+        - WOODEN_PICKAXE
+        - NETHERITE_SHOVEL
+        - DIAMOND_SHOVEL
+        - IRON_SHOVEL
+        - GOLDEN_SHOVEL
+        - STONE_SHOVEL
+        - WOODEN_SHOVEL
+        - NETHERITE_AXE
+        - DIAMOND_AXE
+        - IRON_AXE
+        - GOLDEN_AXE
+        - STONE_AXE
+        - WOODEN_AXE
+    anvil:
+      cost-per-level: 4
+    table:
+      enabled: true
+      base-chance: 0.05
+      chance-per-exp: 0.002
+      levels:
+        1:
+          threshold: 15
+          chance: 0.15
+  # ----------------------------------------------------------------------------
+  # ПИНГЕР
+  # Издает звук, когда прочность предмета падает до критического уровня.
+  # ----------------------------------------------------------------------------
+  pinger:
+    general:
+      enabled: true
+      name: "Пингер"
+      max-level: 1
+      allowed-items:
+        - NETHERITE_PICKAXE
+        - DIAMOND_PICKAXE
+        - IRON_PICKAXE
+        - GOLDEN_PICKAXE
+        - STONE_PICKAXE
+        - WOODEN_PICKAXE
+        - NETHERITE_SHOVEL
+        - DIAMOND_SHOVEL
+        - IRON_SHOVEL
+        - NETHERITE_AXE
+        - DIAMOND_AXE
+        - IRON_AXE
+        - ELYTRA # Можно даже на элитры добавить
+        - SHEARS
+        - FLINT_AND_STEEL
+        - FISHING_ROD
+    anvil:
+      cost-per-level: 3
+    table:
+      enabled: true
+      base-chance: 0.1
+      chance-per-exp: 0.003
+      levels:
+        1:
+          threshold: 15
+          chance: 0.20
+    pinger:
+      sound: "BLOCK_NOTE_BLOCK_PLING"
+      threshold: 20 #Прочность
+  # ----------------------------------------------------------------------------
+  # МАГНИТ
+  # Автоматически перемещает добытые блоки в инвентарь.
+  # ----------------------------------------------------------------------------
+  magnet:
+    general:
+      enabled: true
+      name: "Магнит"
+      max-level: 1      # Максимальный уровень 1 (без римских цифр)
+      allowed-items:
+        - NETHERITE_PICKAXE
+        - DIAMOND_PICKAXE
+        - IRON_PICKAXE
+        - GOLDEN_PICKAXE
+        - STONE_PICKAXE
+        - WOODEN_PICKAXE
+        - NETHERITE_SHOVEL
+        - DIAMOND_SHOVEL
+        - IRON_SHOVEL
+        - GOLDEN_SHOVEL
+        - STONE_SHOVEL
+        - WOODEN_SHOVEL
+        - NETHERITE_AXE
+        - DIAMOND_AXE
+        - IRON_AXE
+        - GOLDEN_AXE
+        - STONE_AXE
+        - WOODEN_AXE
+        - NETHERITE_HOE
+        - DIAMOND_HOE
+    anvil:
+      cost-per-level: 5  # Стоимость наложения книги
+    table:
+      enabled: true
+      base-chance: 0.05
+      chance-per-exp: 0.002
+      levels:
+        1:
+          threshold: 20
+          chance: 0.15
+  # ----------------------------------------------------------------------------
+  # ДРОВОСЕК
+  # То же, что и бульдозер, но для топоров.
+  # ----------------------------------------------------------------------------
+  lumberjack:
+    general:
+      enabled: true
+      name: "Дровосек"
+      max-level: 2
+      allowed-items:
+        - NETHERITE_AXE
+        - DIAMOND_AXE
+        - IRON_AXE
+        - GOLDEN_AXE
+        - STONE_AXE
+        - WOODEN_AXE
+    anvil:
+      cost-per-level: 4
+    table:
+      enabled: true
+      base-chance: 0.05
+      chance-per-exp: 0.001
+      levels:
+        1:
+          threshold: 30
+          chance: 0.10
+        2:
+          threshold: 30
+          chance: 0.02
+    mining:
+      # Радиус (Radius): 1 = 3x3
+      radius-base: 1
+      radius-per-level: 0
+      # Глубина (Depth): 1 = 1 слой
+      depth-base: 1
+      depth-per-level: 1
+  heavy:
+    general:
+      enabled: true
+      name: "Тяжёлый"
+      color: "&8"
+      max-level: 3
+      allowed-items:
+        - NETHERITE_PICKAXE
+        - DIAMOND_PICKAXE
+        - NETHERITE_SWORD
+        - DIAMOND_SWORD
+        - NETHERITE_AXE
+        - DIAMOND_AXE
+    anvil:
+      cost-per-level: 1
+    table:
+      enabled: true
+      base-chance: 0.1
+      chance-per-exp: 0.005
+      levels:
+        1: { threshold: 5, chance: 0.3 }
+        2: { threshold: 15, chance: 0.2 }
+        3: { threshold: 30, chance: 0.1 }
+    effects:
+      duration-base: 60
+      duration-per-level: 40
+      amplifier: 1
+  # ----------------------------------------------------------------------------
+  # МЕГА-БУЛЬДОЗЕР
+  # Копает 9x9x9.
+  # ----------------------------------------------------------------------------
+  mega_bulldozer:
+    general:
+      enabled: true
+      name: "Мега-Бульдозер"
+      max-level: 1
+      allowed-items:
+        - NETHERITE_PICKAXE
+        - DIAMOND_PICKAXE
+        - GOLDEN_PICKAXE
+        - WOODEN_PICKAXE
+        - STONE_PICKAXE
+    anvil:
+      cost-per-level: 10
+    table:
+      enabled: false
+      base-chance: 0.0
+      chance-per-exp: 0.0
+    restrictions:
+      # Список регионов, где этот чар НЕ БУДЕТ работать.
+      blocked-regions:
+        - "spawn"
+        - "pvp_arena"
+  # ----------------------------------------------------------------------------
+  # ПОПРЫГУН
+  # Дает постоянный эффект прыгучести при ношении ботинок.
+  # ----------------------------------------------------------------------------
+  jumper:
+    general:
+      enabled: true
+      name: "Попрыгун"
+      max-level: 1
+      allowed-items:
+        - NETHERITE_BOOTS
+        - DIAMOND_BOOTS
+        - IRON_BOOTS
+        - GOLDEN_BOOTS
+        - CHAINMAIL_BOOTS
+        - LEATHER_BOOTS
+    anvil:
+      cost-per-level: 3
+    table:
+      enabled: true
+      base-chance: 0.1
+      chance-per-exp: 0.003
+      levels:
+        1:
+          threshold: 15
+          chance: 0.20
+    effects:
+      amplifier: 1 # Уровень эффекта (0 = Прыгучесть I, 1 = Прыгучесть II)
+  # ----------------------------------------------------------------------------
+  # ЛАВАХОД
+  # Превращает лаву под ногами в обсидиан (источники) или базальт (текучая).
+  # ----------------------------------------------------------------------------
+  lava_walker:
+    general:
+      enabled: true
+      name: "Лаваход"
+      max-level: 2
+      allowed-items:
+        - NETHERITE_BOOTS
+        - DIAMOND_BOOTS
+        - IRON_BOOTS
+        - GOLDEN_BOOTS
+        - CHAINMAIL_BOOTS
+        - LEATHER_BOOTS
+    anvil:
+      cost-per-level: 4
+    table:
+      enabled: true
+      base-chance: 0.05
+      chance-per-exp: 0.002
+      levels:
+        1:
+          threshold: 15
+          chance: 0.15
+        2:
+          threshold: 30
+          chance: 0.05
+    ranges:
+      1:
+        w: 3
+        h: 1
+        length: 1
+      2:
+        w: 3
+        h: 1
+        length: 3
+  # ----------------------------------------------------------------------------
+  # НЕСТАБИЛЬНЫЙ
+  # Предметы ломаются быстрее. Работает на броне и инструментах.
+  # ----------------------------------------------------------------------------
+  unstable:
+    general:
+      enabled: true
+      name: "Нестабильный"
+      color: "&c"
+      max-level: 3
+      allowed-items:
+        - NETHERITE_PICKAXE
+        - DIAMOND_PICKAXE
+        - IRON_PICKAXE
+        - GOLDEN_PICKAXE
+        - STONE_PICKAXE
+        - WOODEN_PICKAXE
+        - NETHERITE_SHOVEL
+        - DIAMOND_SHOVEL
+        - IRON_SHOVEL
+        - GOLDEN_SHOVEL
+        - STONE_SHOVEL
+        - WOODEN_SHOVEL
+        - NETHERITE_AXE
+        - DIAMOND_AXE
+        - IRON_AXE
+        - GOLDEN_AXE
+        - STONE_AXE
+        - WOODEN_AXE
+        - NETHERITE_HOE
+        - DIAMOND_HOE
+        - NETHERITE_SWORD
+        - DIAMOND_SWORD
+        - IRON_SWORD
+        - GOLDEN_SWORD
+        - WOODEN_SWORD
+        - STONE_SWORD
+        - TRIDENT
+        - NETHERITE_AXE
+        - DIAMOND_AXE
+        - BOW
+        - CROSSBOW
+        - DIAMOND_HELMET
+        - DIAMOND_CHESTPLATE
+        - DIAMOND_LEGGINGS
+        - DIAMOND_BOOTS
+        - GOLDEN_HELMET
+        - GOLDEN_CHESTPLATE
+        - GOLDEN_LEGGINGS
+        - GOLDEN_BOOTS
+        - LEATHER_HELMET
+        - LEATHER_CHESTPLATE
+        - LEATHER_LEGGINGS
+        - LEATHER_BOOTS
+        - IRON_HELMET
+        - IRON_CHESTPLATE
+        - IRON_LEGGINGS
+        - IRON_BOOTS
+    anvil:
+      cost-per-level: 1
+    table:
+      enabled: true
+      base-chance: 0.1
+      chance-per-exp: 0.005
+      levels:
+        1:
+          threshold: 5
+          chance: 0.30
+        2:
+          threshold: 15
+          chance: 0.20
+        3:
+          threshold: 30
+          chance: 0.10
+    durability:
+      # Шанс срабатывания дополнительной поломки.
+      # Пример (ур 1): 0.5 (50% шанс)
+      chance-base: 0.5
+      chance-per-level: 0.1
+
+      # Сколько ДОПОЛНИТЕЛЬНОЙ прочности отнимается при срабатывании.
+      # Ванильный урон (1) + Extra (1) = 2 ед. прочности за раз.
+      extra-damage-base: 1
+      extra-damage-per-level: 0.3
+  # ----------------------------------------------------------------------------
+  # ПАУТИНА
+  # Ломает жилу одинаковых блоков.
+  # ----------------------------------------------------------------------------
+  web:
+    general:
+      enabled: true
+      name: "Паутина"
+      max-level: 1      # Только 1 уровень
+      allowed-items:
+        - NETHERITE_PICKAXE
+        - DIAMOND_PICKAXE
+        - IRON_PICKAXE
+        - GOLDEN_PICKAXE
+        - STONE_PICKAXE
+        - WOODEN_PICKAXE
+        - NETHERITE_AXE
+        - DIAMOND_AXE
+        - IRON_AXE
+        - GOLDEN_AXE
+        - STONE_AXE
+        - WOODEN_AXE
+    anvil:
+      cost-per-level: 8
+    table:
+      enabled: true
+      base-chance: 0.02
+      chance-per-exp: 0.001
+      levels:
+        1:
+          threshold: 30
+          chance: 0.05
+    vein-mine:
+      limit: 64 # Максимум блоков за раз
+      # Список блоков, на которые срабатывает способность.
+      # Можно писать полные названия: COAL_ORE
+      # Или использовать звездочку в начале для окончания: *_ORE (все руды)
+      # *_LOG (все бревна)
+      whitelist:
+        - "*_ORE"
+        - "*_LOG"
+        - "*_STEM"
+        - "ANCIENT_DEBRIS"
+        - "GLOWSTONE"
+        - "AMETHYST_CLUSTER"
+        - "AMETHYST_BLOCK"
+        - "NETHER_QUARTZ_ORE"
+        - "NETHER_GOLD_ORE"
+        - "CLAY"
+        - "GRAVEL"
+  # ----------------------------------------------------------------------------
+  # СТУПОР
+  # При попадании брошенным трезубцем накладывает Слабость и Замедление.
+  # ----------------------------------------------------------------------------
+  stupor:
+    general:
+      enabled: true
+      name: "Ступор"
+      max-level: 3
+      allowed-items:
+        - TRIDENT
+    anvil:
+      cost-per-level: 2
+    table:
+      enabled: true
+      base-chance: 0.10
+      chance-per-exp: 0.003
+      levels:
+        1:
+          threshold: 10
+          chance: 0.25
+        2:
+          threshold: 20
+          chance: 0.15
+        3:
+          threshold: 30
+          chance: 0.05
+    combat:
+      chance-base: 0.40
+      chance-per-level: 0.20
+      effect:
+        duration-base: 60
+        duration-per-level: 20
+        amplifier-divisor: 1
+  # ----------------------------------------------------------------------------
+  # БУЛЬДОЗЕР
+  # Вскапывает область (3x3, 5x5 и т.д.)
+  # ----------------------------------------------------------------------------
+  bulldozer:
+    general:
+      enabled: true
+      name: "Бульдозер"
+      max-level: 2
+      allowed-items:
+        - NETHERITE_PICKAXE
+        - DIAMOND_PICKAXE
+        - IRON_PICKAXE
+        - GOLDEN_PICKAXE
+        - WOODEN_PICKAXE
+        - STONE_PICKAXE
+        - NETHERITE_SHOVEL
+        - DIAMOND_SHOVEL
+        - IRON_SHOVEL
+    anvil:
+      cost-per-level: 4
+    table:
+      enabled: true
+      base-chance: 0.05
+      chance-per-exp: 0.001
+      levels:
+        1:
+          threshold: 30
+          chance: 0.10
+        2:
+          threshold: 30
+          chance: 0.02
+    mining:
+      # Радиус (Radius):
+      # 0 = 1x1 (обычное копание, бесполезно)
+      # 1 = 3x3 (1 блок влево, 1 вправо от центра)
+      # 2 = 5x5
+      # Формула: radius-base + (radius-per-level * уровень)
+      radius-base: 1   # На 1 уровне уже копает 3x3
+      radius-per-level: 0 # На 2 уровне останется 3x3 (можно поставить 1, тогда будет 5x5)
+
+      # Глубина (Depth):
+      # Сколько слоев вглубь.
+      # 1 = 1 слой (стандарт)
+      # Формула: depth-base + (depth-per-level * уровень)
+      depth-base: 1
+      depth-per-level: 1 # На 2 уровне будет копать 2 блока в глубину (3x3x2)
+  # ----------------------------------------------------------------------------
+  # ПРИТЯЖЕНИЕ
+  # Притягивает противника к игроку при попадании трезубца.
+  # ----------------------------------------------------------------------------
+
+  attraction:
+    general:
+      enabled: true
+      name: "Притяжение"
+      max-level: 3
+      allowed-items:
+        - TRIDENT
+    anvil:
+      cost-per-level: 2
+    table:
+      enabled: true
+      base-chance: 0.1
+      chance-per-exp: 0.003
+      levels:
+        1:
+          threshold: 25
+          chance: 0.25
+        2:
+          threshold: 30
+          chance: 0.15
+    pull:
+      # Базовая сила притягивания.
+      # Формула: strength-base + (strength-per-level * Уровень_Чар)
+      strength-base: 1.10
+      strength-per-level: 0.8
+
+      # Добавочная сила вверх
+      # Рекомендуемое значение: 0.3 - 0.8.
+      vertical-bonus: 0.5
+  # ----------------------------------------------------------------------------
+  # ОПЫТНЫЙ
+  # Увеличивает количество опыта, выпадающего из блоков (руды) и мобов.
+  # ----------------------------------------------------------------------------
+  experience:
+    general:
+      enabled: true
+      name: "Опытный"
+      max-level: 3
+      allowed-items:
+        - NETHERITE_PICKAXE
+        - DIAMOND_PICKAXE
+        - IRON_PICKAXE
+        - GOLDEN_PICKAXE
+        - WOODEN_PICKAXE
+        - STONE_PICKAXE
+        - NETHERITE_SWORD
+        - DIAMOND_SWORD
+        - IRON_SWORD
+        - GOLDEN_SWORD
+        - WOODEN_SWORD
+        - STONE_SWORD
+        - TRIDENT
+    anvil:
+      cost-per-level: 2
+    table:
+      enabled: true
+      base-chance: 0.1
+      chance-per-exp: 0.003
+      levels:
+        1:
+          threshold: 5
+          chance: 0.25
+        2:
+          threshold: 25
+          chance: 0.15
+        3:
+          threshold: 30
+          chance: 0.10
+    bonus:
+      # Множитель добавочного опыта.
+      # Формула: multiplier-base + (multiplier-per-level * Уровень_Чар)
+      # Пример (3 уровень): 0.2 + (0.2 * 3) = 0.8.
+      # Это значит +80% к стандартному опыту. Если моб давал 10 XP, даст 18 XP.
+      multiplier-base: 0.2
+      multiplier-per-level: 0.2
