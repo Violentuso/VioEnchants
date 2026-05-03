@@ -51,9 +51,7 @@ public class ExplosiveListener implements Listener {
         int level = 0;
 
         if (projectile instanceof Trident trident) {
-
             ItemStack tridentItem = trident.getItem();
-
             if (tridentItem.hasItemMeta()) {
                 var pdc = tridentItem.getItemMeta().getPersistentDataContainer();
                 if (pdc.has(enchant.KEY, PersistentDataType.INTEGER)) {
@@ -61,7 +59,6 @@ public class ExplosiveListener implements Listener {
                 }
             }
         } else if (projectile instanceof AbstractArrow) {
-
             var pdc = projectile.getPersistentDataContainer();
             if (pdc.has(enchant.KEY, PersistentDataType.INTEGER)) {
                 level = pdc.get(enchant.KEY, PersistentDataType.INTEGER);
@@ -95,19 +92,29 @@ public class ExplosiveListener implements Listener {
                         0.1
                 );
             }
+            if (enchant.ACTIVATION_SOUND != null) {
+                projectile.getWorld().playSound(loc, enchant.ACTIVATION_SOUND, enchant.ACTIVATION_SOUND_VOLUME, enchant.ACTIVATION_SOUND_PITCH);
+            }
+
             double damage = enchant.EXPLOSIVE_DAMAGE_BASE + (enchant.EXPLOSIVE_DAMAGE_PER_LEVEL * level);
             double knockback = enchant.EXPLOSIVE_KNOCKBACK_BASE + (enchant.EXPLOSIVE_KNOCKBACK_PER_LEVEL * level);
             double radius = enchant.EXPLOSIVE_RADIUS;
 
+            Entity shooter = (Entity) projectile.getShooter();
+
             for (Entity entity : projectile.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
                 if (!(entity instanceof LivingEntity victim)) continue;
-                if (entity == projectile.getShooter()) continue;
+                if (entity == shooter) continue;
                 if (entity == projectile) continue;
 
                 double distance = entity.getLocation().distance(loc);
                 if (distance > radius) continue;
 
-                victim.damage(damage, (Entity) projectile.getShooter());
+                if (shooter != null) {
+                    victim.damage(damage, shooter);
+                } else {
+                    victim.damage(damage);
+                }
 
                 Vector vector = entity.getLocation().toVector().subtract(loc.toVector()).normalize();
                 if (Double.isNaN(vector.getX())) vector = new Vector(0, 0.5, 0);
@@ -125,6 +132,5 @@ public class ExplosiveListener implements Listener {
                 projectile.remove();
             }
         }
-
     }
 }

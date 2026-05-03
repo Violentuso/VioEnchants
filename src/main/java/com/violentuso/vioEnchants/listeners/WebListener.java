@@ -74,6 +74,7 @@ public class WebListener implements Listener {
     public static void performWebMining(Block startBlock, Player player, ItemStack tool) {
         Material targetMaterial = startBlock.getType();
         boolean hasAutoSmelt = tool.getItemMeta().getPersistentDataContainer().has(CustomEnchant.AUTOSMELT.KEY, PersistentDataType.INTEGER);
+        boolean hasMagnet = tool.getItemMeta().getPersistentDataContainer().has(CustomEnchant.MAGNET.KEY, PersistentDataType.INTEGER);
         int limit = CustomEnchant.WEB.WEB_LIMIT;
 
         Set<Block> blocksToBreak = new HashSet<>();
@@ -99,6 +100,8 @@ public class WebListener implements Listener {
             }
         }
 
+        boolean playSound = false;
+
         for (Block block : blocksToBreak) {
             if (block.getType() == Material.AIR) continue;
 
@@ -107,39 +110,51 @@ public class WebListener implements Listener {
             VioEnchants.INSTANCE.getServer().getPluginManager().callEvent(checkEvent);
             if (checkEvent.isCancelled()) continue;
 
-            processDrop(block, player, tool, hasAutoSmelt);
+            processDrop(block, player, tool, hasAutoSmelt, hasMagnet);
 
             block.setType(Material.AIR);
+            playSound = true;
             applyDurability(tool, player);
             if (tool.getType() == Material.AIR) break;
         }
+
+        if (playSound && CustomEnchant.WEB.ACTIVATION_SOUND != null) {
+            player.playSound(player.getLocation(), CustomEnchant.WEB.ACTIVATION_SOUND, CustomEnchant.WEB.ACTIVATION_SOUND_VOLUME, CustomEnchant.WEB.ACTIVATION_SOUND_PITCH);
+        }
     }
 
-    public static void processDrop(Block block, Player player, ItemStack tool, boolean hasAutoSmelt) {
+    public static void processDrop(Block block, Player player, ItemStack tool, boolean hasAutoSmelt, boolean hasMagnet) {
         Collection<ItemStack> drops = block.getDrops(tool);
-        int expToDrop = 0;
 
-        if (!block.getType().name().contains("STONE") && !block.getType().name().contains("DIRT")) {
-            expToDrop = 1;
-        }
+        boolean blockWasSmelted = false;
 
         for (ItemStack drop : drops) {
             if (drop == null || drop.getType() == Material.AIR) continue;
+
+            // Если включена автоплавка
             if (hasAutoSmelt) {
                 ItemStack smelted = AutoSmeltListener.trySmelt(drop);
                 if (smelted != null) {
                     drop = smelted;
-                    if (expToDrop == 0) expToDrop = 1;
+                    blockWasSmelted = true; // Отмечаем, что мы переплавили предмет
                 }
             }
-            HashMap<Integer, ItemStack> leftOver = player.getInventory().addItem(drop);
-            for (ItemStack trash : leftOver.values()) {
-                block.getWorld().dropItemNaturally(block.getLocation(), trash);
+
+            if (hasMagnet) {
+                HashMap<Integer, ItemStack> leftOver = player.getInventory().addItem(drop);
+                for (ItemStack trash : leftOver.values()) {
+                    block.getWorld().dropItemNaturally(block.getLocation(), trash);
+                }
+            } else {
+                block.getWorld().dropItemNaturally(block.getLocation(), drop);
             }
         }
 
-        if (expToDrop > 0) {
-            block.getWorld().spawn(block.getLocation(), ExperienceOrb.class).setExperience(expToDrop);
+        if (!blockWasSmelted) {
+
+            if (!block.getType().name().contains("STONE") && !block.getType().name().contains("DIRT")) {
+                block.getWorld().spawn(block.getLocation(), ExperienceOrb.class).setExperience(1);
+            }
         }
     }
 

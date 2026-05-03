@@ -55,11 +55,35 @@ public class AutoSmeltListener implements Listener {
         }
         return null;
     }
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockBreak(org.bukkit.event.block.BlockBreakEvent event) {
+        Player player = event.getPlayer();
+
+
+        if (RegionUtil.isEnchantBlocked(player.getLocation(), CustomEnchant.GLOBAL_BLOCKED_REGIONS, CustomEnchant.GLOBAL_BLOCKED_FLAGS)) return;
+
+        ItemStack tool = player.getInventory().getItemInMainHand();
+        if (tool.getType() == Material.AIR || !tool.hasItemMeta()) return;
+
+
+        if (tool.getItemMeta().getPersistentDataContainer().has(CustomEnchant.AUTOSMELT.KEY, PersistentDataType.INTEGER)) {
+
+
+            ItemStack rawBlock = new ItemStack(event.getBlock().getType());
+
+
+            if (trySmelt(rawBlock) != null) {
+
+                event.setExpToDrop(0);
+            }
+        }
+    }
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockDrop(BlockDropItemEvent event) {
         Player player = event.getPlayer();
         if (player == null) return;
         if (RegionUtil.isEnchantBlocked(player.getLocation(), CustomEnchant.GLOBAL_BLOCKED_REGIONS, CustomEnchant.GLOBAL_BLOCKED_FLAGS)) return;
+
         ItemStack tool = player.getInventory().getItemInMainHand();
         if (tool.getType() == Material.AIR || !tool.hasItemMeta()) return;
 
@@ -67,13 +91,20 @@ public class AutoSmeltListener implements Listener {
             return;
         }
 
+        boolean smeltedAny = false;
+
         for (Item itemEntity : event.getItems()) {
             ItemStack stack = itemEntity.getItemStack();
             ItemStack smelted = trySmelt(stack);
 
             if (smelted != null) {
                 itemEntity.setItemStack(smelted);
+                smeltedAny = true;
             }
+        }
+
+        if (smeltedAny && CustomEnchant.AUTOSMELT.ACTIVATION_SOUND != null) {
+            player.playSound(player.getLocation(), CustomEnchant.AUTOSMELT.ACTIVATION_SOUND, CustomEnchant.AUTOSMELT.ACTIVATION_SOUND_VOLUME, CustomEnchant.AUTOSMELT.ACTIVATION_SOUND_PITCH);
         }
     }
 }

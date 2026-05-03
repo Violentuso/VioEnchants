@@ -66,6 +66,7 @@ public class BulldozerListener implements Listener {
 
         boolean hasAutoSmelt = tool.getItemMeta().getPersistentDataContainer().has(CustomEnchant.AUTOSMELT.KEY, PersistentDataType.INTEGER);
         boolean hasWeb = tool.getItemMeta().getPersistentDataContainer().has(CustomEnchant.WEB.KEY, PersistentDataType.INTEGER);
+        boolean hasMagnet = tool.getItemMeta().getPersistentDataContainer().has(CustomEnchant.MAGNET.KEY, PersistentDataType.INTEGER);
 
         int radius;
         int depth;
@@ -74,7 +75,6 @@ public class BulldozerListener implements Listener {
             radius = 4;
             depth = 9;
             if (isRegionBlocked(player, event.getBlock(), enchantType.MEGA_BULLDOZER_BLOCKED_REGIONS)) {
-                player.sendMessage("§cМагия Мега-Бульдозера здесь не работает!");
                 return;
             }
         } else {
@@ -86,6 +86,8 @@ public class BulldozerListener implements Listener {
         BlockFace face = getBlockFace(player);
         if (face == null) return;
         WebListener.isMining.add(player.getUniqueId());
+
+        boolean playSound = false;
 
         try {
             for (int d = 0; d < depth; d++) {
@@ -119,8 +121,9 @@ public class BulldozerListener implements Listener {
                             if (isRegionBlocked(player, target, enchantType.MEGA_BULLDOZER_BLOCKED_REGIONS)) continue;
                         }
 
-                        WebListener.processDrop(target, player, tool, hasAutoSmelt);
+                        WebListener.processDrop(target, player, tool, hasAutoSmelt, hasMagnet);
                         target.setType(Material.AIR);
+                        playSound = true;
 
                         applyDurability(tool, player);
                         if (tool.getType() == Material.AIR) return;
@@ -129,6 +132,10 @@ public class BulldozerListener implements Listener {
             }
         } finally {
             WebListener.isMining.remove(player.getUniqueId());
+        }
+
+        if (playSound && enchantType.ACTIVATION_SOUND != null) {
+            player.playSound(player.getLocation(), enchantType.ACTIVATION_SOUND, enchantType.ACTIVATION_SOUND_VOLUME, enchantType.ACTIVATION_SOUND_PITCH);
         }
     }
 

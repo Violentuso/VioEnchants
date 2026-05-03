@@ -74,6 +74,11 @@ public class SniperListener implements Listener {
         if (projectile instanceof AbstractArrow arrow) arrow.setGravity(true);
         if (projectile instanceof Trident trident) trident.setGravity(true);
         shooter.getWorld().playSound(shooter.getLocation(), Sound.ENTITY_ARROW_SHOOT, 0.5f, 1.6f + (0.1f * level));
+
+        if (enchant.ACTIVATION_SOUND != null) {
+            shooter.getWorld().playSound(shooter.getLocation(), enchant.ACTIVATION_SOUND, enchant.ACTIVATION_SOUND_VOLUME, enchant.ACTIVATION_SOUND_PITCH);
+        }
+
         Location predictedHit = predictImpactLocation(projectile.getLocation(), newVelocity);
 
         if (predictedHit != null && enchant.SNIPER_PARTICLES_ENABLED) {

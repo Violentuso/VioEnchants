@@ -26,6 +26,10 @@ public class HeavyListener implements Listener {
             int amplifier = enchant.HEAVY_AMPLIFIER;
 
             player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, duration, amplifier));
+
+            if (enchant.ACTIVATION_SOUND != null) {
+                player.playSound(player.getLocation(), enchant.ACTIVATION_SOUND, enchant.ACTIVATION_SOUND_VOLUME, enchant.ACTIVATION_SOUND_PITCH);
+            }
         }
     }
 

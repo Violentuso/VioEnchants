@@ -19,6 +19,7 @@ public class UnstableListener implements Listener {
     public void onItemDamage(PlayerItemDamageEvent event) {
         ItemStack item = event.getItem();
         Player player = event.getPlayer();
+
         if (RegionUtil.isEnchantBlocked(player.getLocation(), CustomEnchant.GLOBAL_BLOCKED_REGIONS, CustomEnchant.GLOBAL_BLOCKED_FLAGS)) return;
         if (item == null || !item.hasItemMeta()) return;
         if (!item.getItemMeta().getPersistentDataContainer().has(CustomEnchant.UNSTABLE.KEY, PersistentDataType.INTEGER)) {
@@ -33,6 +34,9 @@ public class UnstableListener implements Listener {
             int extraDamage = enchant.UNSTABLE_EXTRA_DAMAGE_BASE + (enchant.UNSTABLE_EXTRA_DAMAGE_PER_LEVEL * level);
             if (extraDamage > 0) {
                 event.setDamage(event.getDamage() + extraDamage);
+                if (enchant.ACTIVATION_SOUND != null) {
+                    player.playSound(player.getLocation(), enchant.ACTIVATION_SOUND, enchant.ACTIVATION_SOUND_VOLUME, enchant.ACTIVATION_SOUND_PITCH);
+                }
             }
         }
     }

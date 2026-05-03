@@ -18,12 +18,10 @@ public class ScoutListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onHit(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Trident trident)) return;
-
         if (!(trident.getShooter() instanceof Player shooter)) return;
         if (RegionUtil.isEnchantBlocked(shooter.getLocation(), CustomEnchant.GLOBAL_BLOCKED_REGIONS, CustomEnchant.GLOBAL_BLOCKED_FLAGS)) return;
 
         ItemStack item = trident.getItem();
-
         if (item == null || !item.hasItemMeta()) return;
 
         CustomEnchant enchant = CustomEnchant.SCOUT;
@@ -39,12 +37,19 @@ public class ScoutListener implements Listener {
         Vector playerLoc = shooter.getLocation().toVector();
         Vector direction = targetLoc.subtract(playerLoc);
         direction.normalize();
+
         double force = enchant.SCOUT_STRENGTH_BASE + (enchant.SCOUT_STRENGTH_PER_LEVEL * level);
         direction.multiply(force);
         direction.setY(direction.getY() + enchant.SCOUT_VERTICAL_BONUS);
+
         if (direction.getY() > 2.0) direction.setY(2.0);
         shooter.setVelocity(shooter.getVelocity().add(direction));
         shooter.setFallDistance(0);
-        shooter.getWorld().playSound(shooter.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_3, 1.0f, 1.0f);
+
+        if (enchant.ACTIVATION_SOUND != null) {
+            shooter.getWorld().playSound(shooter.getLocation(), enchant.ACTIVATION_SOUND, enchant.ACTIVATION_SOUND_VOLUME, enchant.ACTIVATION_SOUND_PITCH);
+        } else {
+            shooter.getWorld().playSound(shooter.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_3, 1.0f, 1.0f);
+        }
     }
 }

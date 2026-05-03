@@ -4,6 +4,7 @@ import com.violentuso.vioEnchants.VioEnchants;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -69,7 +70,7 @@ public enum CustomEnchant {
     public Map<Integer, Integer> LAVA_WALKER_L = new HashMap<>();
     public int WEB_LIMIT;
     public List<String> WEB_WHITELIST;
-    public String COLOR = "§7"; // По умолчанию серый
+    public String COLOR = "§7";
     public double EXP_MULTI_BASE;
     public double EXP_MULTI_PER_LEVEL;
     public double SCOUT_STRENGTH_BASE;
@@ -108,6 +109,10 @@ public enum CustomEnchant {
     public double ATTRACTION_STRENGTH_PER_LEVEL;
     public double ATTRACTION_VERTICAL_BONUS;
 
+    public Sound ACTIVATION_SOUND;
+    public float ACTIVATION_SOUND_VOLUME;
+    public float ACTIVATION_SOUND_PITCH;
+
     public static List<String> GLOBAL_BLOCKED_REGIONS = new ArrayList<>();
     public static List<String> GLOBAL_BLOCKED_FLAGS = new ArrayList<>();
 
@@ -135,7 +140,6 @@ public enum CustomEnchant {
             }
 
             enchant.ANVIL_COST = config.getInt(path + ".anvil.cost-per-level", 1);
-
             enchant.TABLE_ENABLED = config.getBoolean(path + ".table.enabled", true);
             enchant.TABLE_CHANCE_BASE = config.getDouble(path + ".table.base-chance", 0.05);
             enchant.TABLE_CHANCE_PER_EXP = config.getDouble(path + ".table.chance-per-exp", 0.001);
@@ -236,6 +240,15 @@ public enum CustomEnchant {
             enchant.SCOUT_STRENGTH_BASE = config.getDouble(path + ".pull.strength-base", 1.0);
             enchant.SCOUT_STRENGTH_PER_LEVEL = config.getDouble(path + ".pull.strength-per-level", 0.5);
             enchant.SCOUT_VERTICAL_BONUS = config.getDouble(path + ".pull.vertical-bonus", 0.5);
+
+            String soundStr = config.getString(path + ".sound.type", "");
+            if (!soundStr.isEmpty()) {
+                try {
+                    enchant.ACTIVATION_SOUND = Sound.valueOf(soundStr.toUpperCase());
+                } catch (Exception ignored) {}
+            }
+            enchant.ACTIVATION_SOUND_VOLUME = (float) config.getDouble(path + ".sound.volume", 1.0);
+            enchant.ACTIVATION_SOUND_PITCH = (float) config.getDouble(path + ".sound.pitch", 1.0);
         }
     }
 

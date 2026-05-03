@@ -18,7 +18,6 @@ public class LavaWalkerListener implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-
         if (event.getFrom().getBlockX() == event.getTo().getBlockX() &&
                 event.getFrom().getBlockY() == event.getTo().getBlockY() &&
                 event.getFrom().getBlockZ() == event.getTo().getBlockZ()) {
@@ -35,14 +34,13 @@ public class LavaWalkerListener implements Listener {
         if (!pdc.has(CustomEnchant.LAVA_WALKER.KEY, PersistentDataType.INTEGER)) return;
 
         int level = pdc.get(CustomEnchant.LAVA_WALKER.KEY, PersistentDataType.INTEGER);
-
         int width = CustomEnchant.LAVA_WALKER.LAVA_WALKER_W.getOrDefault(level, 3);
         int height = CustomEnchant.LAVA_WALKER.LAVA_WALKER_H.getOrDefault(level, 1);
         int length = CustomEnchant.LAVA_WALKER.LAVA_WALKER_L.getOrDefault(level, 3);
 
         Block centerBlock = event.getTo().getBlock();
-
         boolean canActivate = false;
+
         for (int y = 1; y <= height; y++) {
             Material type = centerBlock.getRelative(0, -y, 0).getType();
             if (type == Material.LAVA || type == Material.OBSIDIAN || type == Material.BASALT) {
@@ -54,7 +52,6 @@ public class LavaWalkerListener implements Listener {
         if (!canActivate) return;
 
         BlockFace facing = player.getFacing();
-
         int xSpan = width;
         int zSpan = length;
 
@@ -62,13 +59,14 @@ public class LavaWalkerListener implements Listener {
             xSpan = length;
             zSpan = width;
         }
+
         int halfX = (xSpan - 1) / 2;
         int halfZ = (zSpan - 1) / 2;
+        boolean blocksChanged = false;
 
         for (int x = -halfX; x <= (xSpan / 2); x++) {
             for (int z = -halfZ; z <= (zSpan / 2); z++) {
                 for (int y = 1; y <= height; y++) {
-
                     Block targetBlock = centerBlock.getRelative(x, -y, z);
 
                     if (targetBlock.getType() == Material.LAVA) {
@@ -78,10 +76,15 @@ public class LavaWalkerListener implements Listener {
                             } else {
                                 targetBlock.setType(Material.BASALT);
                             }
+                            blocksChanged = true;
                         }
                     }
                 }
             }
+        }
+
+        if (blocksChanged && CustomEnchant.LAVA_WALKER.ACTIVATION_SOUND != null) {
+            player.playSound(player.getLocation(), CustomEnchant.LAVA_WALKER.ACTIVATION_SOUND, CustomEnchant.LAVA_WALKER.ACTIVATION_SOUND_VOLUME, CustomEnchant.LAVA_WALKER.ACTIVATION_SOUND_PITCH);
         }
     }
 }

@@ -29,18 +29,26 @@ public class AttractionListener implements Listener {
         CustomEnchant enchant = CustomEnchant.ATTRACTION;
         if (!enchant.ENABLED) return;
         if (RegionUtil.isEnchantBlocked(victim.getLocation(), CustomEnchant.GLOBAL_BLOCKED_REGIONS, CustomEnchant.GLOBAL_BLOCKED_FLAGS)) return;
+
         var pdc = item.getItemMeta().getPersistentDataContainer();
         if (!pdc.has(enchant.KEY, PersistentDataType.INTEGER)) return;
 
         int level = pdc.get(enchant.KEY, PersistentDataType.INTEGER);
         if (level <= 0) return;
+
         Vector direction = shooter.getLocation().toVector().subtract(victim.getLocation().toVector());
         direction.normalize();
         double force = enchant.ATTRACTION_STRENGTH_BASE + (enchant.ATTRACTION_STRENGTH_PER_LEVEL * level);
         direction.multiply(force);
         direction.setY(direction.getY() + enchant.ATTRACTION_VERTICAL_BONUS);
         victim.setVelocity(direction);
-        victim.getWorld().playSound(victim.getLocation(), Sound.ENTITY_FISHING_BOBBER_RETRIEVE, 1.0f, 1.2f);
-        shooter.getWorld().playSound(shooter.getLocation(), Sound.ENTITY_FISHING_BOBBER_RETRIEVE, 1.0f, 1.2f);
+
+        if (enchant.ACTIVATION_SOUND != null) {
+            victim.getWorld().playSound(victim.getLocation(), enchant.ACTIVATION_SOUND, enchant.ACTIVATION_SOUND_VOLUME, enchant.ACTIVATION_SOUND_PITCH);
+            shooter.getWorld().playSound(shooter.getLocation(), enchant.ACTIVATION_SOUND, enchant.ACTIVATION_SOUND_VOLUME, enchant.ACTIVATION_SOUND_PITCH);
+        } else {
+            victim.getWorld().playSound(victim.getLocation(), Sound.ENTITY_FISHING_BOBBER_RETRIEVE, 1.0f, 1.2f);
+            shooter.getWorld().playSound(shooter.getLocation(), Sound.ENTITY_FISHING_BOBBER_RETRIEVE, 1.0f, 1.2f);
+        }
     }
 }

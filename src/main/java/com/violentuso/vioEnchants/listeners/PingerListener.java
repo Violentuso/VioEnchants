@@ -2,6 +2,7 @@ package com.violentuso.vioEnchants.listeners;
 
 import com.violentuso.vioEnchants.main.CustomEnchant;
 import com.violentuso.vioEnchants.util.RegionUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,7 +36,7 @@ public class PingerListener implements Listener {
                     Sound sound = Sound.valueOf(enchant.PINGER_SOUND_NAME.toUpperCase());
                     player.playSound(player.getLocation(), sound, 1.0f, 2.0f);
                 } catch (IllegalArgumentException e) {
-                    System.out.println("[VioEnchants] Ошибка: Неверный звук для Pinger в конфиге!");
+                    Bukkit.getLogger().info("[VioEnchants] Ошибка: Неверный звук для Pinger в конфиге!");
                 }
             }
         }

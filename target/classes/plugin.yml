@@ -1,7 +1,7 @@
 name: VioEnchants
-version: 1.0
+version: 1.2
 main: com.violentuso.vioEnchants.VioEnchants
-api-version: 1.20 # или твоя версия
+api-version: 1.16
 depends: WorldGuard
 commands:
   vioenchant:

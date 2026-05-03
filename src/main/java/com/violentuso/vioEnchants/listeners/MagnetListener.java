@@ -22,10 +22,10 @@ public class MagnetListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-
         Player player = event.getPlayer();
         if (player.getGameMode() == GameMode.CREATIVE) return;
         if (RegionUtil.isEnchantBlocked(player.getLocation(), CustomEnchant.GLOBAL_BLOCKED_REGIONS, CustomEnchant.GLOBAL_BLOCKED_FLAGS)) return;
+
         ItemStack tool = player.getInventory().getItemInMainHand();
         if (tool.getType() == Material.AIR || !tool.hasItemMeta()) return;
 
@@ -36,8 +36,10 @@ public class MagnetListener implements Listener {
 
         Block block = event.getBlock();
         if (!event.isDropItems()) return;
+
         Collection<ItemStack> drops = block.getDrops(tool);
         if (drops.isEmpty()) return;
+
         event.setDropItems(false);
         for (ItemStack drop : drops) {
             HashMap<Integer, ItemStack> leftOver = player.getInventory().addItem(drop);
@@ -45,6 +47,11 @@ public class MagnetListener implements Listener {
                 player.getWorld().dropItem(player.getLocation(), surplus);
             }
         }
-        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.5f, 1.5f);
+
+        if (CustomEnchant.MAGNET.ACTIVATION_SOUND != null) {
+            player.playSound(player.getLocation(), CustomEnchant.MAGNET.ACTIVATION_SOUND, CustomEnchant.MAGNET.ACTIVATION_SOUND_VOLUME, CustomEnchant.MAGNET.ACTIVATION_SOUND_PITCH);
+        } else {
+            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.5f, 1.5f);
+        }
     }
 }
